@@ -2,22 +2,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AutomaticActivity">
+    tools:context=".ModesActivity">
 
     <Button
-        android:id="@+id/button_start"
+        android:id="@+id/button_automatic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Automatic Mode"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:text="Start" />
+        android:layout_marginTop="100dp"/>
 
     <Button
-        android:id="@+id/button_stop"
+        android:id="@+id/button_manual"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button_start"
+        android:text="Manual Mode"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Stop" />
+        android:layout_below="@id/button_automatic"
+        android:layout_marginTop="20dp"/>
 </RelativeLayout>

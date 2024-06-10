@@ -8,11 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listViewDevices;
     private TextView textViewStatus;
+    private Button buttonStart;
 
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket bluetoothSocket;
@@ -57,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
         listViewDevices = findViewById(R.id.listViewDevices);
         textViewStatus = findViewById(R.id.textViewStatus);
+        buttonStart = findViewById(R.id.button_start);
+
+        buttonStart.setEnabled(false);  // Disable the Start button initially
 
         deviceList = new ArrayList<>();
         devices = new ArrayList<>();
@@ -76,20 +80,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ModesActivity.class);
+                startActivity(intent);
+            }
+        });
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        REQUEST_PERMISSION_LOCATION);
-            } else {
-                setupBluetooth();
-            }
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         } else {
             setupBluetooth();
         }
@@ -105,18 +111,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void discoverDevices() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT},
-                    REQUEST_PERMISSION_BLUETOOTH);
-            return;
-        }
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN},
-                    REQUEST_PERMISSION_BLUETOOTH);
-            return;
-        }
-
         textViewStatus.setText("Searching for devices...");
         bluetoothAdapter.startDiscovery();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -150,17 +144,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void connectBluetooth() throws IOException {
         if (bluetoothDevice != null) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT},
-                        REQUEST_PERMISSION_BLUETOOTH);
-                return;
-            }
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
             bluetoothSocket.connect();
             outputStream = bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
             Toast.makeText(this, "Connected to " + bluetoothDevice.getName(), Toast.LENGTH_SHORT).show();
             textViewStatus.setText("Connected to " + bluetoothDevice.getName());
+            buttonStart.setEnabled(true);  // Enable the Start button after successful connection
+
+            ((MyApplication) getApplication()).setBluetoothSocket(bluetoothSocket);
         } else {
             Toast.makeText(this, "Bluetooth device not found", Toast.LENGTH_SHORT).show();
             textViewStatus.setText("Bluetooth device not found");

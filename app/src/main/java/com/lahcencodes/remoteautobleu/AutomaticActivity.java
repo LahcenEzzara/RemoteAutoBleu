@@ -1,24 +1,64 @@
 package com.lahcencodes.remoteautobleu;
 
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class AutomaticActivity extends AppCompatActivity {
+
+    private Button buttonStart;
+    private Button buttonStop;
+    private BluetoothSocket bluetoothSocket;
+    private OutputStream outputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_automatic);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        buttonStart = findViewById(R.id.button_start);
+        buttonStop = findViewById(R.id.button_stop);
+
+        bluetoothSocket = ((MyApplication) getApplication()).getBluetoothSocket();
+        if (bluetoothSocket != null) {
+            try {
+                outputStream = bluetoothSocket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendCommand("START_AUTOMATIC");
+            }
         });
+
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendCommand("STOP_AUTOMATIC");
+            }
+        });
+    }
+
+    private void sendCommand(String command) {
+        if (outputStream != null) {
+            try {
+                outputStream.write(command.getBytes());
+                Toast.makeText(this, "Command Sent: " + command, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Failed to send command", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

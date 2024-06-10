@@ -5,7 +5,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/welcome_message"
+        android:id="@+id/textViewStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome to RemoteAutoBleu"
@@ -13,19 +13,19 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"/>
 
-    <TextView
-        android:id="@+id/textViewStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Searching for devices..."
-        android:layout_below="@id/welcome_message"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
-
     <ListView
         android:id="@+id/listViewDevices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewStatus"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/button_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:layout_below="@id/listViewDevices"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"/>
 </RelativeLayout>
